@@ -4,13 +4,13 @@
   "wwwroot": "/datadrive/www-data",
   "tasks": [
     {
-      "name": "solfuzz",
+      "name": "soltest",
       "desc": "Solidity standard",
       "in": "/datadrive/solidity_input/",
       "args": ""
     },
     {
-      "name": "solfuzz_json",
+      "name": "soltest_json",
       "desc": "Solidity JSON ",
       "in": "/datadrive/solidity_json_input/",
       "args": "--standard-json"
