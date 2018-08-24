@@ -49,19 +49,27 @@ def download(artefact = None):
 
 fuzzer = None
 
+def flaskRunner(host, port ):
+    app.run(host, port)
+
+
 def main(args):
     global fuzzer
     config = DEV_CONFIG
 
     if len(args) > 0:    
         with open(args[0]) as fp:
-            data_loaded = json.load(fp)        
+            config = json.load(fp)        
 
     # Start all docker daemons that we'll use during the execution
+
+    thread = threading.Thread(target=flaskRunner, args = (config['host'], config['port']))
+    thread.start()
+
     fuzzer = solfuzz.Fuzzer(config)
     fuzzer.startWork()
-    app.run(config['host'], config['port'])
-
+    thread.join()
+    
 if __name__ == '__main__':
 #    testSummary()
     main(sys.argv[1:])

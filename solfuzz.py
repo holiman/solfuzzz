@@ -27,7 +27,7 @@ class Fuzzer(object):
         os.makedirs(config['sourcedir'], exist_ok = True)
         os.makedirs(config['fuzzbins'], exist_ok = True)
         os.makedirs(config['wwwroot'], exist_ok = True)
-        self.errorred = False
+        self.errored = False
 
     def fetchCode(self):
         
