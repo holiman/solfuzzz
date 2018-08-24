@@ -142,7 +142,7 @@ class Fuzzer(object):
         self.meta['fuzzers'] = info
         return self.meta
 
-    def writeStatus(self,meta):
+    def writeStatus(self):
         """
 
         """
@@ -167,25 +167,25 @@ class Fuzzer(object):
         self.startWork()
         try:
             while True:
-                self.createArchive(meta)    
-                self.writeStatus(meta)
+                self.createArchive()    
+                self.writeStatus()
                 time.sleep(10)
         except KeyboardInterrupt:
             self.quit()
 
     def createArchive(self, meta):
 
-        cmd = ["tar","-cvzf","results-%s.tar.gz" % meta['hash']]
+        cmd = ["tar","-cvzf","results-%s.tar.gz" % self.meta['hash']]
         # Add directories
         for task in self.config['tasks']:
-            cmd.append( "%s-@%s/master/crashes" % (task['name'], meta['hash'])  )
-            cmd.append( "%s-@%s/slave1/crashes" % (task['name'], meta['hash'])  )
-            cmd.append( "%s-@%s/slave2/crashes" % (task['name'], meta['hash'])  )
+            cmd.append( "%s-@%s/master/crashes" % (task['name'], self.meta['hash'])  )
+            cmd.append( "%s-@%s/slave1/crashes" % (task['name'], self.meta['hash'])  )
+            cmd.append( "%s-@%s/slave2/crashes" % (task['name'], self.meta['hash'])  )
 
 
         subprocess.call(cmd, cwd="%s/solidity/" % self.config['wwwroot'])
 
-        meta['archive'] =  "/solidity/results-%s.tar.gz" % meta['hash']
+        self.meta['archive'] =  "/solidity/results-%s.tar.gz" % self.meta['hash']
 
     def quit(self):
         logging.info("Quitting")

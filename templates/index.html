@@ -45,6 +45,7 @@
 
                 <h3>Status</h3>
                 <ul>
+                    <li><a href="{{ status.repo }}/tree/{{ status.branch }}">{{ status.repo }}</a> at commit <code>{{ status.hash }}</code>'</li>
                     <li> Reposotory: <code>{{ status.repo }} </code> </li>
                     <li> Binary <code>{{ status.bin }} </code> </li>
                     <li> Hash : <code>{{ status.hash }} </code> </li>
@@ -53,9 +54,11 @@
             </div>
         </div>
         
-        <a href="/downloadbundle">Download zip</a>
+        <a href="/download/{{ status.archive }}">Download zipped results</a>
         <h3>Fuzzers</h3>
             {% for fuzzer in status.fuzzers  %}
+            <p>{{ fuzzer.output}} - {{ fuzzer.desc}}</p>
+            <pre></pre>
             <pre>{{ fuzzer.status}}</pre>
             {% endfor %}
     

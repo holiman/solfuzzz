@@ -37,11 +37,7 @@ def index():
 def download(artefact = None):
     """ Download a file -- only artefacts allowed """
 
-    artefactDir = fuzzer.cfg.artefacts
-    print("downlaod '%s'" % artefact)
-    if artefact == None or artefact.strip() == "":
-        # file listing
-        return flask.render_template("listing.html", files = sorted(os.listdir(artefactDir), reverse=True) )
+    artefactDir = fuzzer.config["wwwroot"]
 
     insecure_fullpath = os.path.realpath(os.path.join(artefactDir, artefact))
     # Now check that the path is a subdir of artefact idr
