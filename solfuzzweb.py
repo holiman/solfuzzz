@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import solfuzz, sys, os, threading
-import logging
+import logging, json
 logger = logging.getLogger()
 
 try:
@@ -23,10 +23,11 @@ DEV_CONFIG = {
     "tasks" : [
         { "name": "solfuzz" ,"desc" : "Solidity standard", "in": "/datadrive/solidity_input/", "args": ""},
         { "name": "solfuzz_json", "desc" : "Solidity JSON ", "in": "/datadrive/solidity_json_input/", "args": "--standard-json"}
-    ]
+    ],
+    "host":"localhost",
+    "port": 8080
 }
 
-fuzzer = solfuzz.Fuzzer(DEV_CONFIG)
  
 @app.route("/")
 def index():
@@ -46,14 +47,21 @@ def download(artefact = None):
 
     return flask.send_from_directory(artefactDir, artefact, as_attachment=True)
 
+fuzzer = None
 
-def main():
-    host = "localhost"
-    port = 8080
+def main(args):
+    global fuzzer
+    config = DEV_CONFIG
+
+    if len(args) > 0:    
+        with open(args[0]) as fp:
+            data_loaded = json.load(fp)        
+
     # Start all docker daemons that we'll use during the execution
+    fuzzer = solfuzz.Fuzzer(config)
     fuzzer.startWork()
-    app.run(host, port)
+    app.run(config['host'], config['port'])
 
 if __name__ == '__main__':
 #    testSummary()
-    main()
+    main(sys.argv[1:])

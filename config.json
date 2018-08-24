@@ -1,0 +1,21 @@
+{
+  "sourcedir": "/datadrive/solidity/",
+  "fuzzbins": "/datadrive/fuzzbins",
+  "wwwroot": "/datadrive/www-data",
+  "tasks": [
+    {
+      "name": "solfuzz",
+      "desc": "Solidity standard",
+      "in": "/datadrive/solidity_input/",
+      "args": ""
+    },
+    {
+      "name": "solfuzz_json",
+      "desc": "Solidity JSON ",
+      "in": "/datadrive/solidity_json_input/",
+      "args": "--standard-json"
+    }
+  ],
+  "host": "localhost",
+  "port": 8080
+}
