@@ -10,35 +10,51 @@
 </head>
 
 <body>
-<!--
-
-{
-  "repo": "https://github.com/ethereum/solidity.git",
-  "bin": "/datadrive/fuzzbins/solfuzzer_34b28ed",
-  "fuzzers": [
-    {
-      "status": "status check tool for afl-fuzz by <lcamtuf@google.com>\n\nIndividual fuzzers\n==================\n\n>>> master-solfuzz (0 days, 0 hrs) <<<\n\n  cycle 1, lifetime speed 588 execs/sec, path 13/1974 (0%)\n  pending 762/1967, coverage 59.82%, crash count 3 (!)\n\n>>> slave1-solfuzz (0 days, 0 hrs) <<<\n\n  cycle 1, lifetime speed 459 execs/sec, path 309/2219 (13%)\n  pending 648/2049, coverage 59.92%, no crashes yet\n\n>>> slave2-solfuzz (0 days, 0 hrs) <<<\n\n  cycle 1, lifetime speed 403 execs/sec, path 690/2309 (29%)\n  pending 566/2042, coverage 59.92%, no crashes yet\n\nSummary stats\n=============\n\n       Fuzzers alive : 3\n      Total run time : 0 days, 0 hours\n         Total execs : 0 million\n    Cumulative speed : 1450 execs/sec\n       Pending paths : 1976 faves, 6058 total\n  Pending per fuzzer : 658 faves, 2019 total (on average)\n       Crashes found : 3 locally unique\n\n",
-      "output": "/solidity/solfuzz-@34b28ed",
-      "desc": "Solidity standard"
-    },
-    {
-      "status": "status check tool for afl-fuzz by <lcamtuf@google.com>\n\nIndividual fuzzers\n==================\n\n>>> master-solfuzz_json (0 days, 0 hrs) <<<\n\n  cycle 3, lifetime speed 1099 execs/sec, path 33/36 (91%)\n  pending 0/15, coverage 1.44%, no crashes yet\n\n>>> slave1-solfuzz_json (0 days, 0 hrs) <<<\n\n  cycle 107, lifetime speed 1098 execs/sec, path 21/33 (63%)\n  pending 0/0, coverage 1.44%, no crashes yet\n\n>>> slave2-solfuzz_json (0 days, 0 hrs) <<<\n\n  cycle 147, lifetime speed 1096 execs/sec, path 5/32 (15%)\n  pending 0/0, coverage 1.44%, no crashes yet\n\nSummary stats\n=============\n\n       Fuzzers alive : 3\n      Total run time : 0 days, 0 hours\n         Total execs : 1 million\n    Cumulative speed : 3293 execs/sec\n       Pending paths : 0 faves, 15 total\n  Pending per fuzzer : 0 faves, 5 total (on average)\n       Crashes found : 0 locally unique\n\n",
-      "output": "/solidity/solfuzz_json-@34b28ed",
-      "desc": "Solidity JSON "
-    }
-  ],
-  "hash": "34b28ed",
-  "branch": "* develop\n  fuzzer-jsonio"
-}
-
--->
     <div class="container">
         <h1>Solidity fuzzer</h1>
         <div class="row">
             <div class="col-sm">
+
+<!--
+  {
+  "sourcedir": "/datadrive/solidity/",
+  "fuzzbins": "/datadrive/fuzzbins",
+  "wwwroot": "/datadrive/www-data",
+  "tasks": [
+    {
+      "name": "solfuzz",
+      "desc": "Solidity standard",
+      "in": "/datadrive/solidity_input/",
+      "args": ""
+    },
+    {
+      "name": "solfuzz_json",
+      "desc": "Solidity JSON ",
+      "in": "/datadrive/solidity_json_input/",
+      "args": "--standard-json"
+    }
+  ],
+  "host": "localhost",
+  "port": 8080
+}
+
+-->
                 
                 <h3>Config</h3>
-                <pre>{{ config|join('\n') }}</pre>
+                <ul>
+                <li>sourcedir <code>{{ config.sourcedir}}</code></li>
+                <li>fuzzbins <code>{{ config.fuzzbins}}</code></li>
+                <li>wwwroot <code>{{ config.wwwroot}}</code></li>
+                <li>host <code>{{ config.host}}</code></li>
+                <li>port <code>{{ config.port}}</code></li>
+                <li>tasks</li>
+                  <ul>
+            {% for task in config.tasks  %}
+                      <li>{{ task.desc }} - {{ task.name}} input:<code>{{ task.in }}</code> args <code>{{ task.args }} </code></li>
+            {% endfor %}
+                  </ul>
+
+                </ul>
 
             </div>  
             <div class="col-sm">
