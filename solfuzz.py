@@ -13,8 +13,8 @@ PROD_CONFIG = {
     "fuzzbins"    : "/datadrive/fuzzbins",
     "wwwroot"     : "/datadrive/www-data",
     "tasks" : [
-        { "name": "solfuzz" ,"desc" : "Solidity standard", "in": "/datadrive/solidity_input/", "args": ""},
-        { "name": "solfuzz_json", "desc" : "Solidity JSON ", "in": "/datadrive/solidity_json_input/", "args": "--standard-json"}
+        { "name": "soltest" ,"desc" : "Solidity standard", "in": "/datadrive/solidity_input/", "args": ""},
+        { "name": "soltest_json", "desc" : "Solidity JSON ", "in": "/datadrive/solidity_json_input/", "args": "--standard-json"}
     ]
 }
 
@@ -88,8 +88,8 @@ class Fuzzer(object):
 
         builddir = "%s/build" % self.config['sourcedir']
         tag = self.meta['hash']
-        dest = "%s/solfuzzer_%s" % (bindir, tag)
-        copyfile("%s/test/solfuzzer" % builddir, dest)
+        dest = "%s/soltest_%s" % (bindir, tag)
+        copyfile("%s/test/soltest" % builddir, dest)
 
         self.meta['bin'] = dest
         os.chmod(dest, 771)
