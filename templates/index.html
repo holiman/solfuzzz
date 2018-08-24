@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVMLab fuzzer</title>
+    <title>Solidity fuzzer</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.0/mini-default.min.css">
 </head>
 
@@ -60,6 +60,7 @@
             <div class="col-sm">
 
                 <h3>Status</h3>
+                {{ status.status }}
                 <ul>
                     <li><a href="{{ status.repo }}/tree/{{ status.branch }}">{{ status.repo }}</a> at commit <code>{{ status.hash }}</code>'</li>
                     <li> Reposotory: <code>{{ status.repo }} </code> </li>
@@ -67,6 +68,7 @@
                     <li> Hash : <code>{{ status.hash }} </code> </li>
                     <li> Branch : <code>{{ status.branch }} </code> </li>
                 </ul>
+                Errored: {{ status.errored }}
             </div>
         </div>
         
@@ -74,7 +76,6 @@
         <h3>Fuzzers</h3>
             {% for fuzzer in status.fuzzers  %}
             <p>{{ fuzzer.output}} - {{ fuzzer.desc}}</p>
-            <pre></pre>
             <pre>{{ fuzzer.status}}</pre>
             {% endfor %}
     

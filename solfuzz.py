@@ -8,6 +8,16 @@ from shutil import copyfile
 
 DEVNULL= open(os.devnull, 'w')
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
 PROD_CONFIG = {
     "sourcedir"   : "/datadrive/solidity",
     "fuzzbins"    : "/datadrive/fuzzbins",
@@ -69,7 +79,9 @@ class Fuzzer(object):
  
         try:
 
+            logger.info("Invoking cmake")
             subprocess.check_call(cmd, cwd=builddir) 
+            logger.info("Invoking make")
             subprocess.check_call(["make"], cwd=builddir) 
 
         except subprocess.CalledProcessError as cpe:
@@ -103,9 +115,9 @@ class Fuzzer(object):
         output = "%s/solidity/%s-@%s" % (self.config['wwwroot'] ,task['name'], self.meta['hash'])
 
         cmds = [
-            ["afl-fuzz", "-i" ,task['in'],"-o",output,"-M", "master" ,self.meta['bin'], task['args']],
-            ["afl-fuzz", "-i" ,task['in'],"-o",output,"-S", "slave1" ,self.meta['bin'], task['args']],
-            ["afl-fuzz", "-i" ,task['in'],"-o",output,"-S", "slave2" ,self.meta['bin'], task['args']],
+            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-M", "master" ,self.meta['bin'], task['args']],
+            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave1" ,self.meta['bin'], task['args']],
+            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave2" ,self.meta['bin'], task['args']],
         ]
 
         for cmd in cmds:
@@ -131,6 +143,7 @@ class Fuzzer(object):
 
             try:
                 status = subprocess.check_output(["afl-whatsup", syncdir])
+                status = status.decode()
             except subprocess.CalledProcessError as cpe:
                 status = cpe.output
                 self.errored = True
