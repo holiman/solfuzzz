@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import solfuzz, sys, os, threading
-import logging, json
+import logging, json, glob
 logger = logging.getLogger()
 
 try:
@@ -28,10 +28,22 @@ DEV_CONFIG = {
     "port": 8080
 }
 
- 
+@app.route("/update")
+def update():
+    fuzzer.doUpdate()
+    return flask.redirect("/", code=302)
+
 @app.route("/")
 def index():
-    return flask.render_template("index.html", status = fuzzer.status(), config = fuzzer.config)
+
+    artefactsDir = os.path.abspath(os.path.join(fuzzer.config['wwwroot'],"*.tar.gz"))
+    files = glob.glob(artefactsDir)
+    files.sort(key=os.path.getmtime, reverse=True)
+
+    return flask.render_template("index.html", 
+            status = fuzzer.status(), 
+            config = fuzzer.config, 
+            files=[os.path.basename(x) for x in files])
 
 @app.route("/download/")
 @app.route("/download/<artefact>")
@@ -44,8 +56,6 @@ def download(artefact = None):
     # Now check that the path is a subdir of artefact idr
     if not insecure_fullpath.startswith(artefactDir):
         return "Meh, nice try"
-
-    print("Trying to download %s" % artefact)
 
     return flask.send_from_directory(artefactDir, artefact, as_attachment=True)
 

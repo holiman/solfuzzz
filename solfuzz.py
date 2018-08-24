@@ -19,12 +19,12 @@ logger.addHandler(ch)
 
 
 PROD_CONFIG = {
-    "sourcedir"   : "/datadrive/solidity",
-    "fuzzbins"    : "/datadrive/fuzzbins",
-    "wwwroot"     : "/datadrive/www-data",
+    "sourcedir"   : "/tmp/datadrive/solidity",
+    "fuzzbins"    : "/tmp/datadrive/fuzzbins",
+    "wwwroot"     : "/tmp/datadrive/www-data",
     "tasks" : [
-        { "name": "soltest" ,"desc" : "Solidity standard", "in": "/datadrive/solidity_input/", "args": ""},
-        { "name": "soltest_json", "desc" : "Solidity JSON ", "in": "/datadrive/solidity_json_input/", "args": "--standard-json"}
+        { "name": "solfuzzer" ,"desc" : "Solidity standard", "in": "/datadrive/solidity_input/", "args": ""},
+        { "name": "solfuzzer_json", "desc" : "Solidity JSON ", "in": "/datadrive/solidity_json_input/", "args": "--standard-json"}
     ]
 }
 
@@ -63,7 +63,7 @@ class Fuzzer(object):
             self.meta["hash"] = _hash.decode().strip() 
 
         except subprocess.CalledProcessError as cpe:
-            self.meta['status'] = cpe.output
+            self.meta['status'] = "Code update failed: %s" % str(cpe)
             self.errored = True
             return False
 
@@ -85,7 +85,7 @@ class Fuzzer(object):
             subprocess.check_call(["make"], cwd=builddir) 
 
         except subprocess.CalledProcessError as cpe:
-            self.meta['status'] = cpe.output
+            self.meta['status'] = "Compilation failed: %s" % str(cpe)
             self.errored = True
             return False
 
@@ -98,10 +98,9 @@ class Fuzzer(object):
         self.meta['status'] = "Copying files"
         bindir = self.config['fuzzbins']
 
-        builddir = "%s/build" % self.config['sourcedir']
         tag = self.meta['hash']
-        dest = "%s/soltest_%s" % (bindir, tag)
-        copyfile("%s/test/soltest" % builddir, dest)
+        dest = "%s/solfuzzer%s" % (bindir, tag)
+        copyfile("%s/build/test/tools/solfuzzer" %  self.config['sourcedir'], dest)
 
         self.meta['bin'] = dest
         os.chmod(dest, 771)
@@ -114,11 +113,22 @@ class Fuzzer(object):
         name = task['name']
         output = "%s/solidity/%s-@%s" % (self.config['wwwroot'] ,task['name'], self.meta['hash'])
 
-        cmds = [
-            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-M", "master" ,self.meta['bin'], task['args']],
-            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave1" ,self.meta['bin'], task['args']],
-            ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave2" ,self.meta['bin'], task['args']],
-        ]
+
+        # If the sync-dir already exist, AFL will not overwrite it. We can instead choose to resume, 
+        # by setting '-i-' as input
+        if(os.path.isdir(output)):
+            logging.info("Output dir exists already, resuming...")
+            cmds = [
+                ["afl-fuzz", "-m","100","-i-" ,"-o",output,"-M", "master" ,self.meta['bin'], task['args']],
+                ["afl-fuzz", "-m","100","-i-" ,"-o",output,"-S", "slave1" ,self.meta['bin'], task['args']],
+                ["afl-fuzz", "-m","100","-i-" ,"-o",output,"-S", "slave2" ,self.meta['bin'], task['args']],
+            ]
+        else:
+            cmds = [
+                ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-M", "master" ,self.meta['bin'], task['args']],
+                ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave1" ,self.meta['bin'], task['args']],
+                ["afl-fuzz", "-m","100","-i" ,task['in'],"-o",output,"-S", "slave2" ,self.meta['bin'], task['args']],
+            ]
 
         for cmd in cmds:
             logging.info("Starting %s" % (" ".join(cmd)))
@@ -137,15 +147,15 @@ class Fuzzer(object):
 
     def status(self):
         info = []
+        print(self.meta['status'])
         for task in self.config['tasks']:
             output = "/solidity/%s-@%s" % ( task['name'], self.meta['hash'])
             syncdir = "%s/%s" % (self.config['wwwroot'] ,output)
 
             try:
-                status = subprocess.check_output(["afl-whatsup", syncdir])
-                status = status.decode()
+                status = subprocess.check_output(["afl-whatsup", syncdir]).decode()
             except subprocess.CalledProcessError as cpe:
-                status = cpe.output
+                status = "Status check failed: %s" % str(cpe)
                 self.errored = True
             except Exception as e:
                 status = str(e)
@@ -153,6 +163,7 @@ class Fuzzer(object):
 
             info.append({'desc' : task['desc'], "status" : status, "output" : output})
         self.meta['fuzzers'] = info
+        self.meta['errored'] = self.errored
         return self.meta
 
     def writeStatus(self):
@@ -161,26 +172,32 @@ class Fuzzer(object):
         """
         self.dumpJson(self.status(), "fuzzing.json")
 
-    def startWork(self):
-        self.fetchCode()
-        if self.errored:
-            return
-        self.compileCode()
-        if self.errored:
-            return
-        self.copyBins()
-        if self.errored:
-            return
-        jobs = []
-        for task in self.config['tasks']:
-            jobs.append(self.startFuzzers(task))
-        try:
-            while True:
-                self.createArchive()    
-                time.sleep(60)
-        except KeyboardInterrupt:
-            self.quit()
 
+
+    def startWork(self):
+        while True:
+            self.doUpdate = False
+            self.fetchCode()
+            if self.errored:
+                return
+            self.compileCode()
+            if self.errored:
+                return
+            self.copyBins()
+            if self.errored:
+                return
+            jobs = []
+            for task in self.config['tasks']:
+                jobs.append(self.startFuzzers(task))
+
+            while not self.doUpdate:
+                self.createArchive()    
+                try:
+                    time.sleep(60)
+                except KeyboardInterrupt:
+                    self.quit()
+                    return
+            self.killProcs()
 
     def start(self):
         self.startWork()
@@ -202,17 +219,25 @@ class Fuzzer(object):
             cmd.append( "%s-@%s/slave2/crashes" % (task['name'], self.meta['hash'])  )
 
 
-        subprocess.call(cmd, cwd="%s/solidity/" % self.config['wwwroot'])
+        subprocess.call(cmd, cwd="%s" % self.config['wwwroot'])
 
-        self.meta['archive'] =  "/solidity/results-%s.tar.gz" % self.meta['hash']
+        self.meta['archive'] =  "results-%s.tar.gz" % self.meta['hash']
 
-    def quit(self):
-        logging.info("Quitting")
+    def killProcs(self):
+        self.status = "Killing processes"
         for proc in self.procs:
             logging.info("Killing proc : %d" % proc.pid)
             proc.terminate()
-            DEVNULL.close()
+        self.procs = []
 
+    def quit(self):
+        logging.info("Quitting")
+        self.killProcs()
+        DEVNULL.close()
+
+
+    def updateAndRestart():
+        self.doUpdate = True
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
