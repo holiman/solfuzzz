@@ -48,9 +48,9 @@ class Fuzzer(object):
             _hash=subprocess.check_output(["git","log","--pretty=format:%h","-n","1"],cwd=sourcedir)
 
 
-            self.meta["repo"] = decode(_origin).strip()
-            self.meta["branch"] = decode(_branch).strip()
-            self.meta["hash"] = decode(_hash).strip() 
+            self.meta["repo"] = _origin.decode().strip()
+            self.meta["branch"] = _branch.decode().strip()
+            self.meta["hash"] = _hash.decode().strip() 
 
         except subprocess.CalledProcessError as cpe:
             self.meta['status'] = cpe.output
