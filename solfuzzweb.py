@@ -45,6 +45,8 @@ def download(artefact = None):
     if not insecure_fullpath.startswith(artefactDir):
         return "Meh, nice try"
 
+    print("Trying to download %s" % artefact)
+
     return flask.send_from_directory(artefactDir, artefact, as_attachment=True)
 
 fuzzer = None

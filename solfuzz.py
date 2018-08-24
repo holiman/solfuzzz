@@ -174,6 +174,12 @@ class Fuzzer(object):
         jobs = []
         for task in self.config['tasks']:
             jobs.append(self.startFuzzers(task))
+        try:
+            while True:
+                self.createArchive()    
+                time.sleep(60)
+        except KeyboardInterrupt:
+            self.quit()
 
 
     def start(self):
@@ -186,7 +192,7 @@ class Fuzzer(object):
         except KeyboardInterrupt:
             self.quit()
 
-    def createArchive(self, meta):
+    def createArchive(self):
 
         cmd = ["tar","-cvzf","results-%s.tar.gz" % self.meta['hash']]
         # Add directories
