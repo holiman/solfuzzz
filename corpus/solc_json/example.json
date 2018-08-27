@@ -1,0 +1,46 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "myFile.sol": {
+      "content": "contract myfile is owned { function kill() { if
+(msg.sender == owner) selfdestruct(owner); } }"
+
+    },
+    "mortal": {
+      "content": "contract mortal is owned { function kill() { if
+(msg.sender == owner) selfdestruct(owner); } }"
+    }
+  },
+  "settings": {
+    "remappings": [
+      ":g/dir"
+    ],
+    "optimizer": {
+      "enabled": true,
+      "runs": 2
+    },
+    "metadata": {
+      "useLiteralContent": true
+    },
+    "libraries": {
+      "myFile.sol": {
+        "MyLib": "contract mortal is owned { function kill() { if
+(msg.sender == owner) selfdestruct(owner); } }"
+      }
+    },
+    "outputSelection": {
+      "*": {
+        "": [
+          "legacyAST"
+        ]
+      },
+      "def": {
+        "MyContract": [
+          "abi",
+          "evm.bytecode.opcodes"
+        ]
+      }
+    }
+  }
+}
+
