@@ -37,6 +37,7 @@ class Fuzzer(object):
         os.makedirs(config['sourcedir'], exist_ok = True)
         os.makedirs(config['fuzzbins'], exist_ok = True)
         os.makedirs(config['wwwroot'], exist_ok = True)
+        os.makedirs(config['output'], exist_ok = True)
         self.errored = False
 
     def fetchCode(self):
@@ -150,7 +151,7 @@ class Fuzzer(object):
         print(self.meta['status'])
         for task in self.config['tasks']:
             output = "/solidity/%s-@%s" % ( task['name'], self.meta['hash'])
-            syncdir = "%s/%s" % (self.config['wwwroot'] ,output)
+            syncdir = "%s/%s" % (self.config['output'] ,output)
 
             try:
                 status = subprocess.check_output(["afl-whatsup", syncdir]).decode()
