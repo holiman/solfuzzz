@@ -111,7 +111,7 @@ class Fuzzer(object):
         self.meta['status'] = "Starting fuzzers"
 
         name = task['name']
-        output = "%s/solidity/%s-@%s" % (self.config['wwwroot'] ,task['name'], self.meta['hash'])
+        output = "%s/solidity/%s-@%s" % (self.config['output'] ,task['name'], self.meta['hash'])
 
 
         # If the sync-dir already exist, AFL will not overwrite it. We can instead choose to resume, 
@@ -214,9 +214,9 @@ class Fuzzer(object):
         cmd = ["tar","-cvzf","results-%s.tar.gz" % self.meta['hash']]
         # Add directories
         for task in self.config['tasks']:
-            cmd.append( "%s-@%s/master/crashes" % (task['name'], self.meta['hash'])  )
-            cmd.append( "%s-@%s/slave1/crashes" % (task['name'], self.meta['hash'])  )
-            cmd.append( "%s-@%s/slave2/crashes" % (task['name'], self.meta['hash'])  )
+            cmd.append( "%s/solidity/%s-@%s/master/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
+            cmd.append( "%s/solidity/%s-@%s/slave1/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
+            cmd.append( "%s/solidity/%s-@%s/slave2/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
 
 
         subprocess.call(cmd, cwd="%s" % self.config['wwwroot'])

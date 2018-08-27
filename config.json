@@ -2,6 +2,7 @@
   "sourcedir": "/datadrive/solidity/",
   "fuzzbins": "/datadrive/fuzzbins",
   "wwwroot": "/datadrive/www-data",
+  "output": "/datadrive/solidity_output",
   "tasks": [
     {
       "name": "soltest",
