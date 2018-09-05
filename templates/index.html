@@ -74,7 +74,7 @@ function githubRepoLink(repo, commit, branch){
                     <li>Repository:
                       <script type="text/javascript">
                       document.write(
-                        githubRepoLink("{{ status.repo }}","{{ status.tree }}","{{ status.branch }}"));
+                        githubRepoLink("{{ status.repo }}","{{ status.hash }}","{{ status.branch }}"));
                     </script></li>
                     <li> Binary <code>{{ status.bin }} </code> </li>
                 </ul>
