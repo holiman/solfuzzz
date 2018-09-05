@@ -25,10 +25,6 @@ function html_encode (str){
       
 function githubRepoLink(repo, commit, branch){
 
-  repo = "https://github.com/ethereum/solidity.git"
-  commit = "410d288"
-  branch = "* develop"
-
   if (repo == "" ) {return "";}    
   if (commit == "" ) {return repo;}
   if (branch == "" ) {return repo+"@"+data.commit.slice(0,7);}
