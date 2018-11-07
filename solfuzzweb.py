@@ -30,7 +30,7 @@ DEV_CONFIG = {
 
 @app.route("/update")
 def update():
-    fuzzer.doUpdate()
+    fuzzer.updateAndRestart()
     return flask.redirect("/", code=302)
 
 @app.route("/")
