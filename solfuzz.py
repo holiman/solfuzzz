@@ -210,6 +210,15 @@ class Fuzzer(object):
         except KeyboardInterrupt:
             self.quit()
 
+    def newCreateArchive(self):
+        for task in self.config['tasks']:
+            root1 = ( "%s/solidity/%s-@%s/master/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
+            root2 = ( "%s/solidity/%s-@%s/slave1/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
+            root3 = ( "%s/solidity/%s-@%s/slave2/crashes" % (self.config['output'], task['name'], self.meta['hash'])  )
+        # Run each testcase against the target binary
+        # compare the outputs (should be assertions)
+                    
+
     def createArchive(self):
 
         cmd = ["tar","-cvzf","results-%s.tar.gz" % self.meta['hash']]
@@ -237,7 +246,7 @@ class Fuzzer(object):
         DEVNULL.close()
 
 
-    def updateAndRestart():
+    def updateAndRestart(self):
         self.doUpdate = True
 
 if __name__ == '__main__':
